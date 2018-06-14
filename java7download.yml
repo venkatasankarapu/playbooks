@@ -1,0 +1,32 @@
+--- 
+- 
+  hosts: nodes
+  remote_user: root
+  become: yes
+  tasks: 
+    - 
+      #command: "wget -q -O {{java_archive}} --no-check-certificate --no-cookies --header 'Cookie: oraclelicense=accept-securebackup-cookie' {{download_url}} creates={{java_archive}}"
+      get_url:
+       url: http://download.oracle.com/otn-pub/java/jdk/8u131-b11/d54c1d3a095b4ff2b6607d096fa80163/jdk-8u131-linux-i586.tar.gz
+       dest: /opt
+       headers: 'Cookie:oraclelicense=accept-securebackup-cookie'
+      name: "Download Java"
+    - 
+      #command: "unarchive -zxf {{java_archive}} creates={{java_name}}"
+      name: "Unpack archive"
+      unarchive: src=/opt/jdk-8u131-linux-i586.tar.gz  dest={{download_folder}}
+      #apt: package=unzip state=present  
+    - 
+      name: install
+      shell: 'for f in `ls /opt/jdk1.8.0_131/bin`; do update-alternatives --install "/usr/bin/${f}" "${f}" "/opt/jdk1.8.0_131/bin/${f}" 1; done'
+    - 
+      apt: pkg={{ item }} state=present update-cache=yes force=yes
+      with_items: 
+       - oracle-java8-installer
+       - oracle-java8-set-default 
+      name: "install java 8"
+  vars: 
+    download_folder: /opt
+    download_url: "http://download.oracle.com/otn-pub/java/jdk/8u5-b13/jdk-8u5-linux-x64.tar.gz"
+    java_archive: "/opt/jdk-8u5-linux-x64.tar.gz"
+    java_name: "{{download_folder}}/jdk1.8.0_05"

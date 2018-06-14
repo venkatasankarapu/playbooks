@@ -1,0 +1,21 @@
+--- 
+- 
+  hosts: nodes
+  remote_user: root
+  tasks: 
+    - 
+      apt_key: "url=https://download.docker.com/linux/ubuntu/gpg"
+      name: "Add Docker GPG key"
+    - 
+      apt_repository: 
+        repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable
+        state: present
+        update_cache: yes
+      name: "Add Docker APT repository"
+    - 
+      apt: name=docker-ce update_cache=yes state=latest
+      name: "Install Docker docker-ce=18.03"
+      #apt: name=docker-ce=18.03.* state=present  update_cache=yes
+    - 
+      name: "docker service status"
+      service: name=docker state=restarted
